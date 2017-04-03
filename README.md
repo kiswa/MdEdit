@@ -1,16 +1,16 @@
-# ![MdEdit Icon](../assets/icon.png) MdEdit
+# ![MdEdit Icon](./assets/icon.png) MdEdit
 
 MdEdit is a minimalist Markdown editor that lets you write Markdown files with a live preview and otherwise stays out of your way.
 
-![MdEdit](../.github/MdEdit.png)
+![MdEdit](./.github/MdEdit.png)
 
 Head over to the [releases](https://github.com/kiswa/MdEdit/releases) to get the version for your system!
 
 There are just a few options in the Settings, including a dark theme:
 
-![MdEdit Settings](../.github/MdEdit_settings.png)
+![MdEdit Settings](./.github/MdEdit_settings.png)
 
-![MdEdit Settings](../.github/MdEdit_settings_dark.png)
+![MdEdit Settings](./.github/MdEdit_settings_dark.png)
 
 ## Development
 
