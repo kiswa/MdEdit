@@ -1,0 +1,245 @@
+html, body {
+    font-family: 'Source Sans Pro';
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    box-sizing: border-box;
+    font-size: 1.2rem;
+    height: 100%;
+    line-height: 1.4rem;
+}
+
+body.dark,
+.dark textarea,
+.dark table {
+    background-color: rgb(40, 40, 40);
+    color: rgba(255, 255, 255, .7);
+}
+
+.dark .preview {
+    background-color: rgb(50, 50, 50);
+}
+
+.dark thead,
+.dark tr:nth-child(even) {
+    background-color: rgb(60, 60, 60);
+}
+
+a {
+    color: rebeccapurple;
+}
+
+body {
+    background-color: rgb(240, 240, 240);
+    color: #333;
+    height: calc(100% - 1.6em);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
+}
+
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+::-webkit-scrollbar-track {
+    background-color: rgb(230, 230, 230);
+}
+
+.dark ::-webkit-scrollbar-track {
+    background-color: rgb(30, 30, 30);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, .1);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background-color: rgb(45, 45, 45);
+}
+
+pre {
+    background-color: #2d2d2d;
+    border-radius: 4px;
+    color: #ccc;
+    font-family: 'Source Code Pro';
+    overflow: auto;
+    padding: .5em;
+    width: 100%;
+}
+
+header {
+    -webkit-app-region: drag;
+    background-image: linear-gradient(to bottom, rgb(250, 250, 250) 50%, transparent);
+    color: rgba(0, 0, 0, .4);
+    display: flex;
+    height: 2.5em;
+    left: 0;
+    padding: 5px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    user-select: none;
+}
+
+.dark header {
+    background-image: linear-gradient(to bottom, rgb(50, 50, 50) 50%, transparent);
+    color: rgba(255, 255, 255, .7);
+}
+
+header img {
+    float: left;
+}
+
+header span {
+    margin-left: 1em;
+}
+
+header .icon {
+    -webkit-app-region: no-drag;
+}
+
+.icon:hover {
+    color: rgba(0, 0, 0, .7);
+}
+
+.dark .icon:hover {
+    color: rgb(255, 255, 255);
+}
+
+.left,
+.right {
+    width: 50%;
+}
+
+#expandEditor,
+#close {
+    float: right;
+}
+
+#expandEditor {
+    margin-right: -5px;
+}
+
+#expandPreview {
+    margin-left: -5px;
+}
+
+textarea {
+    background-color: rgb(235, 235, 235);
+    border: none;
+    font-family: 'Source Code Pro';
+    font-size: 15px;
+    height: 100%;
+    outline: none;
+    resize: none;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    height: 100%;
+    margin-top: 1.6em;
+}
+
+.editor,
+.preview {
+    padding: 1em;
+    transition: width .5s;
+    width: 50%;
+}
+
+.expanded {
+    padding: 1em 15%;
+    width: 100%;
+}
+
+.collapsed {
+    padding: 0;
+    width: 0;
+}
+
+.preview {
+    background-color: rgb(245, 245, 245);
+    overflow: auto;
+    user-select: none;
+}
+
+.hidden {
+    display: none;
+}
+
+#notification {
+    background-color: rgb(180, 180, 245);
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, .3);
+    color: #fff;
+    cursor: pointer;
+    left: calc(50% - 200px);
+    padding: .5em;
+    position: absolute;
+    text-align: center;
+    top: 2em;
+    width: 400px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    line-height: 1em;
+}
+
+table {
+    background-color: rgb(250, 250, 250);
+    border-collapse: collapse;
+    border-radius: 4px;
+    margin-bottom: 1em;
+    width: 100%;
+}
+
+thead {
+    background-color: rgb(240, 240, 240);
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+tr:nth-child(even) {
+    background-color: rgb(240, 240, 240);
+}
+
+blockquote {
+    border-left: 5px solid rgba(0, 0, 0, .1);
+    margin-left: 0;
+    padding-left: 40px;
+}
+
+img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+code {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, .1);
+    padding: 0 3px;
+}
+
+pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+}

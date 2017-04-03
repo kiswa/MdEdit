@@ -1,0 +1,30 @@
+{
+  "name": "mdedit",
+  "productName": "MdEdit",
+  "version": "1.0.0",
+  "description": "A minimalist Markdown editor",
+  "main": "main.js",
+  "author": "Matthew Ross <root@matthewross.me> (https://matthewross.me)",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/kiswa/MdEdit"
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "package": "npm run package-lin && npm run package-win && npm run package-mac",
+    "package-lin": "electron-packager ./ --platform linux --arch \"ia32,x64\" --asar true --out dist/ --overwrite --app-copyright \"Copyright © 2017 Matthew Ross\" --icon ./assets/icon",
+    "package-win": "electron-packager ./ --platform win32 --arch \"ia32,x64\" --asar true --out dist/ --overwrite --app-copyright \"Copyright © 2017 Matthew Ross\" --icon ./assets/icon --win32metadata.FileDescription \"A simple Markdown editor.\" --win32metadata.ProductName MdEdit --win32metadata.OriginalFilename MdEdit.exe --win32metadata.CompanyName \"Matthew Ross\"",
+    "package-mac": "electron-packager ./ --platform darwin --arch \"ia32,x64\" --asar true --out dist/ --overwrite --app-copyright \"Copyright © 2017 Matthew Ross\" --icon ./assets/icon",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "electron": "^1.6.2",
+    "electron-packager": "^8.6.0"
+  },
+  "dependencies": {
+    "highlight.js": "^9.10.0",
+    "marked": "^0.3.6"
+  }
+}
+

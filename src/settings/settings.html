@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Settings</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="../../assets/fonts/fonts.css">
+        <link rel="stylesheet" href="../../assets/fonts/icons.css">
+    </head>
+    <body>
+        <header>
+            <div>
+                Settings
+                <span>
+                    <i id="close" class="icon-close"></i>
+                </span>
+            </div>
+        </header>
+
+        <section>
+            <div>
+                <label>
+                    Re-open previously open file? <input id="reopen" type="checkbox">
+                </label>
+            </div>
+            <div>
+                <label>
+                    Remember view layout? <input id="layout" type="checkbox">
+                </label>
+            </div>
+            <div>
+                <label>
+                    Theme:
+                    <select id="theme">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="about">
+                <img src="../../assets/icon.png" alt="MdEdit" title="MdEdit"><br>
+                MdEdit
+                <p>
+                    Version: <span id="version"></span><br>
+                    MIT License<br>
+                    <a id="github" href="https://github.com/kiswa/MdEdit">GitHub</a>
+                </p>
+            </div>
+        </section>
+
+        <script src="settings.js"></script>
+    </body>
+</html>
+

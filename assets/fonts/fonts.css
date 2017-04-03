@@ -1,0 +1,17 @@
+@font-face {
+    font-family: 'Source Code Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('☺'),
+        url(SourceCodePro-Regular.woff) format('woff'),
+        url(SourceCodePro-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    font-style: normal;
+    font-weight: 400;
+    src: local('☺'),
+        url(SourceSansPro-Regular.woff) format('woff'),
+        url(SourceSansPro-Regular.ttf) format('truetype');
+}
