@@ -33,7 +33,11 @@ if (currentFile && currentFile !== '') {
 }
 
 if (localStorage.getItem('reopen') === 'true' && localStorage.getItem('lastFile')) {
-    loadFile(localStorage.getItem('lastFile'));
+    try {
+        loadFile(localStorage.getItem('lastFile'));
+    } catch (ex) {
+        // Ignore
+    }
 }
 
 initShortcuts();

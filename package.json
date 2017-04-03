@@ -1,7 +1,7 @@
 {
   "name": "mdedit",
   "productName": "MdEdit",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimalist Markdown editor",
   "main": "main.js",
   "author": "Matthew Ross <root@matthewross.me> (https://matthewross.me)",
