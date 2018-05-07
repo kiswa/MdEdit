@@ -209,8 +209,11 @@ export default {
 
     openFileFromPath (path) {
       try {
-        const parts = path.split('\\')
+        const sep = process.platform === 'win32' ? '\\' : '/'
+        const parts = path.split(sep)
         const contents = fs.readFileSync(path)
+
+        console.log(parts)
 
         localStorage.setItem('lastFile', path)
         remote.app.addRecentDocument(path)
@@ -221,7 +224,7 @@ export default {
         this.openFileName = parts[parts.length - 1]
 
         parts.splice(-1)
-        this.openFilePath = parts.join('\\') + '\\'
+        this.openFilePath = parts.join(sep) + sep
 
         this.focusEditor()
       } catch (e) {

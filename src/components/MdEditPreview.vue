@@ -29,48 +29,7 @@ export default {
   },
 
   created () {
-    const renderer = new marked.Renderer()
-
-    renderer.listitem = text => {
-      if (/^\s*\[[x ]\]\s*/.test(text)) {
-        text = text
-          .replace(/^\s*\[ \]\s*/,
-            '<i class="icon icon-check-empty"></i> ')
-          .replace(/^\s*\[x\]\s*/,
-            '<i class="icon icon-check"></i> ')
-        return '<li class="checklist">' + text + '</li>'
-      }
-
-      return '<li>' + text + '</li>'
-    }
-
-    renderer.image = (href, title, text) => {
-      if (href.indexOf('http') !== 0) {
-        href = 'file:///' + this.filePath + href
-      }
-
-      let m
-      let size = ''
-
-      if (title && (m = title.match(/^(\d+)x(\d+)$/))) {
-        size = ' width="' + m[1] + '" height="' + m[2] + '"'
-      }
-
-      return '<img src="' + href + '" alt="' + text + '"' +
-        (title ? ' title="' + title + '"' : '') + size + '>'
-    }
-
-    marked.setOptions({
-      renderer,
-      gfm: true,
-      breaks: true,
-      tables: true,
-      smartypants: true,
-      langPrefix: '',
-      highlight: (code) => {
-        return hljs.highlightAuto(code).value
-      }
-    })
+    this.initMarked()
   },
 
   watch: {
@@ -88,6 +47,10 @@ export default {
 
     compiledMarkdown () {
       setTimeout(this.updateLinks, 10)
+    },
+
+    filePath () {
+      this.initMarked()
     }
   },
 
@@ -98,6 +61,52 @@ export default {
   },
 
   methods: {
+    initMarked () {
+      const renderer = new marked.Renderer()
+      console.log('filePath', this.filePath)
+
+      renderer.listitem = text => {
+        if (/^\s*\[[x ]\]\s*/.test(text)) {
+          text = text
+            .replace(/^\s*\[ \]\s*/,
+              '<i class="icon icon-check-empty"></i> ')
+            .replace(/^\s*\[x\]\s*/,
+              '<i class="icon icon-check"></i> ')
+          return '<li class="checklist">' + text + '</li>'
+        }
+
+        return '<li>' + text + '</li>'
+      }
+
+      renderer.image = (href, title, text) => {
+        if (href.indexOf('http') !== 0) {
+          href = 'file:///' + this.filePath + href
+        }
+
+        let m
+        let size = ''
+
+        if (title && (m = title.match(/^(\d+)x(\d+)$/))) {
+          size = ' width="' + m[1] + '" height="' + m[2] + '"'
+        }
+
+        return '<img src="' + href + '" alt="' + text + '"' +
+          (title ? ' title="' + title + '"' : '') + size + '>'
+      }
+
+      marked.setOptions({
+        renderer,
+        gfm: true,
+        breaks: true,
+        tables: true,
+        smartypants: true,
+        langPrefix: '',
+        highlight: (code) => {
+          return hljs.highlightAuto(code).value
+        }
+      })
+    },
+
     updateLinks () {
       Array.from(document.getElementsByTagName('a'))
         .forEach(link => {

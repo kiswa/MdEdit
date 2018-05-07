@@ -79,9 +79,6 @@
         },
         {
           "target": "deb"
-        },
-        {
-          "target": "rpm"
         }
       ]
     }
