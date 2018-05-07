@@ -6,8 +6,6 @@ MdEdit supports relative image paths, as well as defining image size via the tit
 
 ![MdEdit](./.github/MdEdit.png)
 
-Head over to the [releases](https://github.com/kiswa/MdEdit/releases) to get the version for your system!
-
 ## Features
 
  * Relative image paths
@@ -32,6 +30,12 @@ There are just a few options in the Settings. The status bar shows the path to t
 Including a dark theme.
 
 ![Settings](./.github/MdEdit_settings_dark.png)
+
+## Building
+
+ * Clone the repo: `git clone https://github.com/kiswa/MdEdit`
+ * Install dependencies: `npm i`
+ * Build it: `npm run build`
 
 ## Development
 
