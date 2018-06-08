@@ -11,15 +11,15 @@ MdEdit supports relative image paths, as well as defining image size via the tit
  * Relative image paths
  * Synchronized scrolling between editor and preview
  * Standard keyboard shortcuts (substitute <kbd>Cmd</kbd> for <kbd>Ctrl</kbd> on Mac)
-  * <kbd>Ctrl</kbd>+<kbd>s</kbd> to save
-  * <kbd>Ctrl</kbd>+<kbd>n</kbd> for new file
-  * <kbd>Ctrl</kbd>+<kbd>o</kbd> to open a file
+   * <kbd>Ctrl</kbd>+<kbd>s</kbd> to save
+   * <kbd>Ctrl</kbd>+<kbd>n</kbd> for new file
+   * <kbd>Ctrl</kbd>+<kbd>o</kbd> to open a file
  * Image size setting in title
-  * *e.g.* `![Alt Text](./path/to/image.png "128x128")`
-  * If not set, the image will be limited to 100% width
+   * *e.g.* `![Alt Text](./path/to/image.png "128x128")`
+   * If not set, the image will be limited to 100% width
  * Checklists
-  * Just like GitHub ` - [ ] ToDo` is unchecked, and ` - [x]  Done` is checked
-  * Visual only - not interactive
+   * Just like GitHub ` - [ ] ToDo` is unchecked, and ` - [x]  Done` is checked
+   * Visual only - not interactive
 
 ## Settings
 
