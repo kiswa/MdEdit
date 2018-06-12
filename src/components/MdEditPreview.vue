@@ -47,6 +47,7 @@ export default {
 
     compiledMarkdown () {
       setTimeout(this.updateLinks, 10)
+      setTimeout(this.updateCheckboxes, 10)
     },
 
     filePath () {
@@ -63,19 +64,9 @@ export default {
   methods: {
     initMarked () {
       const renderer = new marked.Renderer()
-      console.log('filePath', this.filePath)
 
-      renderer.listitem = text => {
-        if (/^\s*\[[x ]\]\s*/.test(text)) {
-          text = text
-            .replace(/^\s*\[ \]\s*/,
-              '<i class="icon icon-check-empty"></i> ')
-            .replace(/^\s*\[x\]\s*/,
-              '<i class="icon icon-check"></i> ')
-          return '<li class="checklist">' + text + '</li>'
-        }
-
-        return '<li>' + text + '</li>'
+      renderer.checkbox = isChecked => {
+        return '<i class="icon icon-check' + (isChecked ? '' : '-empty') + '"></i> '
       }
 
       renderer.image = (href, title, text) => {
@@ -107,19 +98,26 @@ export default {
       })
     },
 
-    updateLinks () {
-      Array.from(document.getElementsByTagName('a'))
-        .forEach(link => {
-          link.onclick = evt => {
-            if (evt.target.hostname === 'localhost' && evt.target.hash.length) {
-              return
-            }
+    updateCheckboxes () {
+      Array.from(document.getElementsByClassName('icon')).forEach(el => {
+        if (el.parentNode && el.parentNode.tagName === 'LI') {
+          el.parentNode.classList.add('checklist')
+        }
+      })
+    },
 
-            evt.stopPropagation()
-            evt.preventDefault()
-            shell.openExternal(evt.target.href)
+    updateLinks () {
+      Array.from(document.getElementsByTagName('a')).forEach(link => {
+        link.onclick = evt => {
+          if (evt.target.hostname === 'localhost' && evt.target.hash.length) {
+            return
           }
-        })
+
+          evt.stopPropagation()
+          evt.preventDefault()
+          shell.openExternal(evt.target.href)
+        }
+      })
     }
   }
 }

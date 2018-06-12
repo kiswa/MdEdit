@@ -50,7 +50,7 @@
 
     <div class="bottom">
       <img src="../assets/icon.png" width="128">
-      MdEdit v1.1.0
+      MdEdit v1.1.1
       <p>
         <a href="https://opensource.org/licenses/MIT"
           @click="openExternal">MIT License</a> |
