@@ -117,7 +117,7 @@ export default {
       this.isPreviewView = JSON.parse(localStorage.getItem('isPreviewView'))
     }
 
-    let fileToOpen = ipcRenderer.sendSync('get-file-data')
+    const fileToOpen = ipcRenderer.sendSync('get-file-data')
     if (fileToOpen && fileToOpen.length && this.openFileFromPath(fileToOpen)) {
       return
     }
@@ -192,12 +192,12 @@ export default {
             { name: 'Markdown Documents', extensions: ['md', 'markdown'] }
           ],
           properties: ['openFile']
-        }, filenames => {
-          if (!filenames || filenames.length === 0) {
+        }).then(result => {
+          if (result.canceled) {
             return
           }
 
-          const path = filenames[0]
+          const path = result.filePaths[0]
           if (!path || !path.length) {
             return
           }
@@ -212,8 +212,6 @@ export default {
         const sep = process.platform === 'win32' ? '\\' : '/'
         const parts = path.split(sep)
         const contents = fs.readFileSync(path)
-
-        console.log(parts)
 
         localStorage.setItem('lastFile', path)
         remote.app.addRecentDocument(path)
@@ -277,6 +275,7 @@ export default {
       this.checkUnsaved(() => {
         this.updateMarkdown('', false)
         this.openFile = ''
+        this.openFileName = ''
       })
     },
 
