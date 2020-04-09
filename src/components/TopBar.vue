@@ -1,98 +1,122 @@
 <template>
-<header v-if="iconsLoaded">
-  <div class="left">
-    <img src="../assets/icon.png" height="32px" alt="MdEdit" title="MdEdit">
+  <nav v-if="iconsLoaded">
+    <div class="left">
+      <img
+        src="../assets/icon.png"
+        height="32px"
+        alt="MdEdit"
+        title="MdEdit"
+      >
 
-    <div class="icon" title="New File" @click="newFile">
-      <font-awesome-icon v-if="usePro" :icon="['fal', 'file-plus']" title="New File" />
-      <font-awesome-icon v-else icon="file" title="New File" />
+      <div
+        class="icon"
+        title="New File"
+        @click="newFile"
+      >
+        <font-awesome-icon :icon="['fal', 'file-plus']" />
+      </div>
+
+      <div
+        class="icon"
+        title="Open File"
+        @click="openFile"
+      >
+        <font-awesome-icon :icon="['fal', 'folder-open']" />
+      </div>
+
+      <div
+        class="icon"
+        :title="'Save ' + fileName"
+        @click="saveFile"
+      >
+        <font-awesome-icon :icon="['fal', 'save']" />
+      </div>
+
+      <div
+        class="icon"
+        title="Settings"
+        @click="toggleSettings"
+      >
+        <font-awesome-icon :icon="['fal', 'cog']" />
+      </div>
+
+      <div
+        class="icon auto-right"
+        title="Expand Editor"
+        @click="expandEditor"
+      >
+        <font-awesome-icon :icon="['fal', 'angle-right']" />
+      </div>
     </div>
 
-    <div class="icon" title="Open File" @click="openFile">
-      <font-awesome-icon v-if="usePro" :icon="['fal', 'folder-open']" />
-      <font-awesome-icon v-else icon="folder-open" />
-    </div>
+    <div class="right">
+      <div
+        class="icon auto-left"
+        title="Expand Preview"
+        @click="expandPreview"
+      >
+        <font-awesome-icon :icon="['fal', 'angle-left']" />
+      </div>
 
-    <div class="icon" :title="'Save ' + fileName" @click="saveFile">
-      <font-awesome-icon v-if="usePro" :icon="['fal', 'save']" />
-      <font-awesome-icon v-else icon="save" />
+      <div
+        class="icon close"
+        title="Close"
+        @click="closeApp"
+      >
+        <font-awesome-icon :icon="['fal', 'times']" />
+      </div>
     </div>
-
-    <div class="icon" title="Settings" @click="toggleSettings">
-      <font-awesome-icon v-if="usePro" :icon="['fal', 'cog']" />
-      <font-awesome-icon v-else icon="cog" />
-    </div>
-
-    <div class="icon auto-right" title="Expand Editor"
-      @click="expandEditor">
-      <font-awesome-icon v-if="usePro" :icon="['fal', 'angle-right']" />
-      <font-awesome-icon v-else icon="angle-right" />
-    </div>
-  </div>
-
-  <div class="right">
-    <div class="icon auto-left" title="Expand Preview"
-      @click="expandPreview">
-      <font-awesome-icon v-if="usePro" :icon="['fal', 'angle-left']" />
-      <font-awesome-icon v-else icon="angle-left" />
-    </div>
-
-    <div class="icon close" title="Close" @click="closeApp">
-      <font-awesome-icon v-if="usePro" :icon="['fal', 'times']" />
-      <font-awesome-icon v-else icon="times" />
-    </div>
-  </div>
-</header>
+  </nav>
 </template>
 
-<script>
-import { remote } from 'electron'
+<script lang="ts">
+import Vue from 'vue'
 
-export default {
-  name: 'MdEditHeader',
+export default Vue.extend({
+  name: 'TopBar',
 
   props: {
     isEditorView: {
       type: Boolean,
       default: false
     },
+
     isPreviewView: {
       type: Boolean,
       default: false
     },
+
     isEdited: {
       type: Boolean,
       default: false
     },
-    usePro: {
-      type: Boolean,
-      default: false
-    },
+
     iconsLoaded: {
       type: Boolean,
       default: false
     },
-    fileName: {
+
+    filename: {
       type: String,
       default: 'File'
     }
   },
 
-  mounted () {
-    const file = remote.getGlobal('fileToOpen')
+  data () {
+    return {
+      fileName: 'File'
+    }
+  },
 
-    if (file.length) {
-      this.fileName = file
+  watch: {
+    filename () {
+      this.fileName = this.filename
     }
   },
 
   methods: {
-    closeApp () {
-      this.$emit('closeApp')
-    },
-
     newFile () {
-      this.$emit('resetEditor')
+      this.$emit('newFile')
     },
 
     openFile () {
@@ -133,15 +157,19 @@ export default {
       this.notifyChanges(false, true)
     },
 
+    closeApp () {
+      this.$emit('closeApp')
+    },
+
     notifyChanges (isEditorView = false, isPreviewView = false) {
       this.$emit('viewChanged', { isEditorView, isPreviewView })
     }
   }
-}
+})
 </script>
 
-<style scoped lang="scss">
-header {
+<style lang="scss" scoped>
+nav {
   -webkit-app-region: drag;
   align-items: center;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14),

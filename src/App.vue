@@ -1,95 +1,129 @@
 <template>
-  <div id="app" :class="{ dark: isDarkTheme }"
+  <div
+    id="app"
+    :class="{ dark: isDarkTheme }"
     @keyup.ctrl.83="saveFile"
     @keyup.meta.83="saveFile"
     @keyup.ctrl.78="resetEditor"
     @keyup.meta.78="resetEditor"
-    @keyup.ctrl.79="loadFile">
-
-    <md-edit-header :isEditorView="isEditorView"
-      :isPreviewView="isPreviewView"
-      :isEdited="isEdited"
-      :use-pro="useProIcons"
+    @keyup.ctrl.79="loadFile"
+  >
+    <top-bar
       :icons-loaded="iconsLoaded"
-      :fileName="openFileName"
-      @viewChanged="updateView"
-      @closeApp="closeApp"
+      :filename="openFilename"
+      :is-editor-view="isEditorView"
+      :is-preview-view="isPreviewView"
+      :is-edited="isEdited"
       @resetEditor="resetEditor"
       @loadFile="loadFile"
       @saveFile="saveFile"
-      @toggleSettings="toggleSettings()" />
+      @viewChanged="updateView"
+      @closeApp="closeApp"
+      @toggleSettings="toggleSettings"
+    />
 
-    <md-edit-settings v-if="showSettings"
-      :use-pro="useProIcons"
+    <settings
+      v-if="showSettings"
       :icons-loaded="iconsLoaded"
       @closeSettings="showSettings = false"
-      @settingsChanged="updateSettings" />
+      @settingsChanged="updateSettings"
+    />
 
-    <div class="container" :class="{ 'with-status': showStatus }">
-      <div class="left"
-        :class="{ 'full': isEditorView, 'shrunk': isPreviewView }">
-        <md-edit-editor :markdown="markdown"
-          :scrollPercent="editorScrollPercent"
+    <div
+      class="container"
+      :class="{ 'with-status': showStatus }"
+    >
+      <div
+        class="left"
+        :class="{ 'full': isEditorView, 'shrunk': isPreviewView }"
+      >
+        <editor
+          :markdown="markdown"
+          :scroll-percent="editorScrollPercent"
           @markdownChanged="updateMarkdown"
-          @scrolled="editorScrolled" />
+          @scrolled="editorScrolled"
+        />
       </div>
 
-      <div class="right" id="preview"
+      <div
+        id="preview"
+        class="right"
         :class="{ 'full': isPreviewView, 'shrunk': isEditorView }"
-        @scroll="updatePreviewScroll">
-        <md-edit-preview :markdown="markdown"
-          :filePath="openFilePath"
-          :scrollPercent="previewScrollPercent" />
+        @scroll="updatePreviewScroll"
+      >
+        <preview
+          :markdown="markdown"
+          :file-path="openFilePath"
+          :scroll-percent="previewScrollPercent"
+        />
       </div>
     </div>
 
     <div class="container is-status">
-      <md-edit-status v-if="showStatus"
-        :isEdited="isEdited"
-        :filename="openFile" />
+      <status-bar
+        v-if="showStatus"
+        :is-edited="isEdited"
+        :filename="openFile"
+      />
     </div>
 
-    <div id="notification" v-if="showNote" @click="showNote = false">
+    <div
+      v-if="showNote"
+      id="notification"
+      @click="showNote = false"
+    >
       <div>Saved file {{ openFile }}</div>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from 'vue'
+import { remote, ipcRenderer } from 'electron'
+import fs from 'fs'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-import { remote, ipcRenderer } from 'electron'
-import fs from 'fs'
-
-import MdEditHeader from './components/MdEditHeader.vue'
-import MdEditEditor from './components/MdEditEditor.vue'
-import MdEditPreview from './components/MdEditPreview.vue'
-import MdEditSettings from './components/MdEditSettings.vue'
-import MdEditStatus from './components/MdEditStatus.vue'
+import Editor from './components/Editor.vue'
+import Preview from './components/Preview.vue'
+import StatusBar from './components/StatusBar.vue'
+import Settings from './components/Settings.vue'
+import TopBar from './components/TopBar.vue'
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
-export default {
-  name: 'app',
+
+interface ViewChanges {
+  isEditorView: boolean;
+  isPreviewView: boolean;
+}
+
+interface WindowData {
+  x: number | undefined;
+  y: number | undefined;
+  height: number | undefined;
+  width: number | undefined;
+  isMaximized: boolean | undefined;
+}
+
+export default Vue.extend({
+  name: 'App',
 
   components: {
-    MdEditHeader,
-    MdEditEditor,
-    MdEditPreview,
-    MdEditSettings,
-    MdEditStatus
+    Editor,
+    Preview,
+    Settings,
+    StatusBar,
+    TopBar
   },
 
   data () {
     return {
-      markdown: '',
-      openFile: '',
-      openFileName: '',
+      openFilename: '',
       openFilePath: '',
+      openFile: '',
+      markdown: '',
 
-      useProIcons: false,
       iconsLoaded: false,
       isEditorView: false,
       isPreviewView: false,
@@ -98,6 +132,7 @@ export default {
       isEdited: false,
       isDarkTheme: false,
       rememberLayout: false,
+      loadPrevious: false,
 
       showSettings: false,
       showStatus: false,
@@ -108,13 +143,76 @@ export default {
     }
   },
 
+  created () {
+    const newInfo: WindowData = {
+      height: 600,
+      width: 800,
+      x: undefined,
+      y: undefined,
+      isMaximized: false
+    }
+
+    const getInfo = () => {
+      let infoStr = localStorage.getItem('windowInfo')
+
+      if (infoStr === null) {
+        infoStr = JSON.stringify(newInfo)
+      }
+
+      return JSON.parse(infoStr)
+    }
+
+    const windowInfo = getInfo()
+
+    if (windowInfo === newInfo) {
+      localStorage.setItem('windowInfo', JSON.stringify(newInfo))
+    }
+
+    const info = getInfo()
+    const win = remote.getCurrentWindow()
+
+    win.setSize(info.width, info.height)
+
+    if (info.x && info.y) {
+      win.setPosition(info.x, info.y)
+    }
+
+    if (info.isMaximized) {
+      remote.getCurrentWindow().maximize()
+    }
+
+    const handler = (evt: any) => {
+      const info = getInfo()
+      Object.assign(info, evt.sender.getBounds())
+      localStorage.setItem('windowInfo', JSON.stringify(info))
+      localStorage.setItem('windowInfo', JSON.stringify(info))
+    }
+
+    win.on('move', handler)
+    win.on('resize', handler)
+    win.on('maximize', () => {
+      const info = getInfo()
+      info.isMaximized = true
+      localStorage.setItem('windowInfo', JSON.stringify(info))
+    })
+  },
+
   mounted () {
     this.loadIcons()
     this.updateSettings()
 
+    const file = remote.getGlobal('fileToOpen')
+
+    if (file.length) {
+      this.openFilename = file
+    }
+
     if (this.rememberLayout) {
-      this.isEditorView = JSON.parse(localStorage.getItem('isEditorView'))
-      this.isPreviewView = JSON.parse(localStorage.getItem('isPreviewView'))
+      const isEd = localStorage.getItem('isEditorView')
+      const isPre = localStorage.getItem('isPreviewView')
+
+      this.isEditorView = isEd ? JSON.parse(isEd) : false
+      this.isPreviewView = isPre ? JSON.parse(isPre) : false
     }
 
     const fileToOpen = ipcRenderer.sendSync('get-file-data')
@@ -123,7 +221,7 @@ export default {
     }
 
     if (this.loadPrevious) {
-      const path = localStorage.getItem('lastFile')
+      const path = localStorage.getItem('lastFile') || ''
       this.openFileFromPath(path)
     }
   },
@@ -131,7 +229,7 @@ export default {
   methods: {
     focusEditor () {
       setTimeout(() => {
-        const editor = document.getElementById('editor')
+        const editor = document.getElementById('editor') as HTMLInputElement
 
         editor.focus()
         editor.setSelectionRange(0, 0)
@@ -139,49 +237,16 @@ export default {
       }, 250)
     },
 
-    closeApp () {
-      this.checkUnsaved(() => {
-        remote.getCurrentWindow().close()
-      })
+    updateView (values: ViewChanges) {
+      this.isEditorView = values.isEditorView
+      this.isPreviewView = values.isPreviewView
+
+      localStorage.setItem('isEditorView', this.isEditorView.toString())
+      localStorage.setItem('isPreviewView', this.isPreviewView.toString())
     },
 
-    loadIcons () {
-      let faSave, faFile, faFilePlus, faFolderOpen, faCog,
-        faAngleLeft, faAngleRight, faTimes
-
-      /* eslint-disable */
-      import('@fortawesome/pro-light-svg-icons')
-        .then(pro => {
-          faSave = pro.faSave
-          faFilePlus = pro.faFilePlus
-          faFolderOpen = pro.faFolderOpen
-          faCog = pro.faCog
-          faAngleLeft = pro.faAngleLeft
-          faAngleRight = pro.faAngleRight
-          faTimes = pro.faTimes
-
-          library.add(faSave, faFilePlus, faFolderOpen, faCog,
-            faAngleRight, faAngleLeft, faTimes)
-          this.useProIcons = true
-          this.iconsLoaded = true
-        }, err => {
-          import('@fortawesome/free-solid-svg-icons')
-            .then(free => {
-              faSave = free.faSave
-              faFile = free.faFile
-              faFolderOpen = free.faFolderOpen
-              faCog = free.faCog
-              faAngleLeft = free.faAngleLeft
-              faAngleRight = free.faAngleRight
-              faTimes = free.faTimes
-
-              library.add(faSave, faFile, faFolderOpen, faCog,
-                faAngleRight, faAngleLeft, faTimes)
-              this.useProIcons = false
-              this.iconsLoaded = true
-            })
-        })
-      /* eslint-enable */
+    closeApp () {
+      this.checkUnsaved(() => remote.getCurrentWindow().close())
     },
 
     loadFile () {
@@ -207,7 +272,7 @@ export default {
       })
     },
 
-    openFileFromPath (path) {
+    openFileFromPath (path: string) {
       try {
         const sep = process.platform === 'win32' ? '\\' : '/'
         const parts = path.split(sep)
@@ -219,7 +284,7 @@ export default {
         this.markdown = contents.toString()
         this.isEdited = false
         this.openFile = path
-        this.openFileName = parts[parts.length - 1]
+        this.openFilename = parts[parts.length - 1]
 
         parts.splice(-1)
         this.openFilePath = parts.join(sep) + sep
@@ -243,23 +308,59 @@ export default {
       remote.dialog.showSaveDialog({
         title: 'Save Markdown File',
         filters: [{ name: 'Markdown Documents', extensions: ['md', 'markdown'] }]
-      }, filename => {
-        if (!filename) {
+      }).then(result => {
+        if (!result.filePath) {
           return
         }
 
-        fs.writeFileSync(filename, this.markdown)
+        fs.writeFileSync(result.filePath, this.markdown)
 
-        this.openFile = filename
+        this.openFile = result.filePath
         this.isEdited = false
         this.notifySaved()
       })
     },
 
+    checkUnsaved (fn: Function) {
+      if (!this.isEdited) {
+        fn()
+        return
+      }
+
+      remote.dialog.showMessageBox({
+        cancelId: 1,
+        type: 'question',
+        message: 'You have unsaved changes, discard and continue?',
+        buttons: ['OK', 'Cancel']
+      }).then(buttonId => {
+        if (buttonId.response === 0) {
+          fn()
+        }
+      })
+    },
+
+    loadIcons () {
+      import('@fortawesome/pro-light-svg-icons')
+        .then(pro => {
+          const faSave = pro.faSave
+          const faFilePlus = pro.faFilePlus
+          const faFolderOpen = pro.faFolderOpen
+          const faCog = pro.faCog
+          const faAngleLeft = pro.faAngleLeft
+          const faAngleRight = pro.faAngleRight
+          const faTimes = pro.faTimes
+
+          library.add(faSave, faFilePlus, faFolderOpen, faCog,
+            faAngleRight, faAngleLeft, faTimes)
+          this.iconsLoaded = true
+        })
+    },
+
     updateSettings () {
-      const settings = localStorage.getItem('settings')
-        ? JSON.parse(localStorage.getItem('settings'))
-        : {}
+      const settingsString = localStorage.getItem('settings')
+      const settings = settingsString === null
+        ? {}
+        : JSON.parse(settingsString)
 
       this.isDarkTheme = settings.theme ? settings.theme === 'dark' : false
       this.showStatus = settings.showStatus ? settings.showStatus : false
@@ -275,30 +376,22 @@ export default {
       this.checkUnsaved(() => {
         this.updateMarkdown('', false)
         this.openFile = ''
-        this.openFileName = ''
+        this.openFilename = ''
       })
     },
 
-    updateMarkdown (text, isEdit = true) {
+    updateMarkdown (text: string, isEdit = true) {
       this.markdown = text
       this.isEdited = isEdit
     },
 
-    updateView (values) {
-      this.isEditorView = values.isEditorView
-      this.isPreviewView = values.isPreviewView
-
-      localStorage.setItem('isEditorView', this.isEditorView)
-      localStorage.setItem('isPreviewView', this.isPreviewView)
-    },
-
-    updatePreviewScroll (event) {
+    updatePreviewScroll () {
       if (this.isUpdatingScroll) {
         this.isUpdatingScroll = false
         return
       }
 
-      const preview = document.getElementById('preview')
+      const preview = document.getElementById('preview') as HTMLDivElement
       const scrollTop = preview.scrollTop
       const height = preview.scrollHeight
       const clientHeight = preview.clientHeight
@@ -307,7 +400,7 @@ export default {
       this.editorScrollPercent = scrollTop / (height - clientHeight)
     },
 
-    editorScrolled (percent) {
+    editorScrolled (percent: number) {
       if (this.isUpdatingScroll) {
         this.isUpdatingScroll = false
         return
@@ -317,24 +410,6 @@ export default {
       this.previewScrollPercent = percent
     },
 
-    checkUnsaved (fn) {
-      if (!this.isEdited) {
-        fn()
-        return
-      }
-
-      remote.dialog.showMessageBox({
-        cancelId: 1,
-        type: 'question',
-        message: 'You have unsaved changes, discard and continue?',
-        buttons: ['OK', 'Cancel']
-      }, (buttonId) => {
-        if (buttonId === 0) {
-          fn()
-        }
-      })
-    },
-
     notifySaved () {
       this.showNote = true
 
@@ -342,10 +417,10 @@ export default {
         this.showNote = false
       }
 
-      setTimeout(hideNote.bind(this), 2000)
+      setTimeout(hideNote.bind(this), 3000)
     }
   }
-}
+})
 </script>
 
 <style lang="scss">
@@ -362,16 +437,20 @@ html {
 }
 
 ::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
+  height: 8px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-button {
-    display: none;
+  display: none;
 }
 
 ::-webkit-scrollbar-track {
-    background-color: rgb(230, 230, 230);
+  background-color: rgb(230, 230, 230);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, .1);
 }
 
 .dark {
@@ -382,10 +461,6 @@ html {
   ::-webkit-scrollbar-thumb {
     background-color: rgb(45, 45, 45);
   }
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, .1);
 }
 
 body {
@@ -401,7 +476,7 @@ body {
     select {
       background-color: #585858 !important;
       background-image: url('assets/dropdown-arrow.png'),
-                        linear-gradient(#585858, #585858) !important;
+      linear-gradient(#585858, #585858) !important;
     }
 
     .container {
@@ -425,17 +500,17 @@ body {
   border: 1px solid #444;
   border-radius: 3px;
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, .15),
-              0 4px 14px 0 rgba(0, 0, 0, .12);
+  0 4px 14px 0 rgba(0, 0, 0, .12);
   color: #fefefe;
   cursor: pointer;
   display: flex;
   height: 3.5rem;
   justify-content: center;
-  left: calc(50% - 150px);
+  left: calc(50% - 300px);
   padding: .5em;
   position: absolute;
   top: 45px;
-  width: 300px;
+  width: 600px;
 }
 
 .dark {

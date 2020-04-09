@@ -1,6 +1,8 @@
 import { app, ipcMain, protocol, BrowserWindow } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 
+app.allowRendererProcessReuse = true
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 let mainWindow: BrowserWindow | null
@@ -11,31 +13,24 @@ protocol.registerSchemesAsPrivileged([{
   privileges: { secure: true, standard: true }
 }])
 
-function createMainWindow () {
+function createWindow () {
   const win = new BrowserWindow({
-    center: true,
-    frame: false,
-    height: 750,
-    minHeight: 480,
-    minWidth: 640,
-    show: false,
     title: 'MdEdit',
-    width: 1200,
+    frame: false,
+    show: false,
+    height: 600,
+    width: 800,
     webPreferences: {
       nodeIntegration: true,
       webSecurity: false
     }
   })
 
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    win.loadURL(process.env.WEBPACK_DEV_SERVER_URL as string)
-    
-    if (!process.env.IS_TEST) {
-      win.webContents.openDevTools()
-    }
-  } else {
-    createProtocol('app')
-    win.loadURL('app://./index.html')
+  const url = getUrl()
+  win.loadURL(url)
+
+  if (process.env.WEBPACK_DEV_SERVER_URL && !process.env.IS_TEST) {
+    win.webContents.openDevTools()
   }
 
   win.once('ready-to-show', () => {
@@ -50,8 +45,17 @@ function createMainWindow () {
   return win
 }
 
+function getUrl() {
+  if (process.env.WEBPACK_DEV_SERVER_URL) {
+    return process.env.WEBPACK_DEV_SERVER_URL
+  } else {
+    createProtocol('app')
+    return 'app://./index.html'
+  }
+
+}
+
 ipcMain.on('get-file-data', event => {
-  console.log(event)
   event.returnValue = process.argv.length > 1
     ? process.argv[1]
     : null
@@ -65,12 +69,12 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    mainWindow = createMainWindow()
+    mainWindow = createWindow()
   }
 })
 
-app.on('ready', async () => {
-  mainWindow = createMainWindow()
+app.on('ready', () => {
+  mainWindow = createWindow()
 })
 
 if (isDevelopment) {

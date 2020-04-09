@@ -1,0 +1,24 @@
+appId: "com.kiswa.md-edit"
+productName: "MdEdit"
+
+asar: true
+
+copyright: "Copyright © 2017-2020 ${author}"
+
+linux:
+  category: TextEditor
+  icon: ./build/icon.icns
+  target:
+    - AppImage
+    - pacman
+    - deb
+
+win:
+  icon: ./build/icon.ico
+  target:
+    - nsis
+
+mac:
+  icon: ./build/icon.icns
+  target:
+    - tar.gz

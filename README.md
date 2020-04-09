@@ -35,7 +35,7 @@ Including a dark theme.
 
  * Clone the repo: `git clone https://github.com/kiswa/MdEdit`
  * Install dependencies: `npm i`
- * Build it: `npm run build`
+ * Build it: `npm run electron:build`
 
 ## Development
 
@@ -45,9 +45,9 @@ If you want to develop for MdEdit it's very simple:
 
  * Clone the repo: `git clone https://github.com/kiswa/MdEdit`
  * Install dependencies: `npm i`
- * Run it: `npm run serve`
+ * Run it: `npm run electron:serve`
 
-**NB:** The releases are built using Font Awesome Pro icons. If you have a license - and have npm set up for it - your local builds will use these icons. If not, it will default to Font Awesome Free icons (which will look different from the screenshots above).
+**NB:** The releases are built using Font Awesome Pro icons. If you have a license - and have npm set up for it - your local builds will use these icons. If not, you will get errors.
 
 ## Thanks To:
 

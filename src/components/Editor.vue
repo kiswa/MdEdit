@@ -1,31 +1,36 @@
 <template>
   <div>
-    <textarea id="editor" :value="markdown" wrap="soft"
+    <textarea
+      id="editor"
+      :value="markdown"
+      wrap="soft"
       @input="updateMarkdown"
-      @scroll="updateScroll">
-    </textarea>
+      @scroll="updateScroll"
+    />
   </div>
 </template>
 
-<script>
-export default {
-  name: 'MdEditEditor',
+<script lang="ts">
+import Vue from 'vue'
+
+export default Vue.extend({
+  name: 'Editor',
 
   props: {
     markdown: {
-      default: '',
-      type: String
+      type: String,
+      default: ''
     },
 
     scrollPercent: {
-      default: 0,
-      type: Number
+      type: Number,
+      default: 0
     }
   },
 
   watch: {
     scrollPercent (percent) {
-      const editor = document.getElementById('editor')
+      const editor = document.getElementById('editor') as HTMLInputElement
       const height = editor.scrollHeight
       const clientHeight = editor.clientHeight
 
@@ -34,8 +39,8 @@ export default {
   },
 
   methods: {
-    updateMarkdown (event) {
-      this.$emit('markdownChanged', event.target.value)
+    updateMarkdown (event: InputEvent) {
+      this.$emit('markdownChanged', (event.target as HTMLTextAreaElement).value)
     },
 
     updateScroll () {
@@ -43,7 +48,7 @@ export default {
     },
 
     calcPercent () {
-      const editor = document.getElementById('editor')
+      const editor = document.getElementById('editor') as HTMLTextAreaElement
       const scrollTop = editor.scrollTop
       const height = editor.scrollHeight
       const clientHeight = editor.clientHeight
@@ -51,7 +56,7 @@ export default {
       return scrollTop / (height - clientHeight)
     }
   }
-}
+})
 </script>
 
 <style lang="scss">
