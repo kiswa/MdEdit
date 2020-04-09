@@ -1,48 +1,50 @@
 <template>
-  <div class="preview" v-html="compiledMarkdown">
-  </div>
+  <div
+    class="preview"
+    v-html="compiledMarkdown"
+  />
 </template>
 
-<script>
-import marked from 'marked'
-import hljs from 'highlight.js'
+<script lang="ts">
+import Vue from 'vue'
 import { shell } from 'electron'
 
-export default {
-  name: 'MdEditPreview',
+import marked from 'marked'
+import hljs from 'highlight.js'
+
+export default Vue.extend({
+  name: 'Preview',
 
   props: {
     markdown: {
-      default: '',
-      type: String
+      type: String,
+      default: ''
     },
 
     scrollPercent: {
-      default: 0,
-      type: Number
+      type: Number,
+      default: 0
     },
 
     filePath: {
-      default: '',
-      type: String
+      type: String,
+      default: ''
     }
   },
 
-  created () {
-    this.initMarked()
+  computed: {
+    compiledMarkdown () {
+      return marked(this.markdown)
+    }
   },
 
   watch: {
-    scrollPercent (percent) {
-      const preview = document.getElementById('preview')
+    scrollPercent (percent: number) {
+      const preview = document.getElementById('preview') as HTMLDivElement
       const height = preview.scrollHeight
       const clientHeight = preview.clientHeight
 
-      const oldScroll = preview.onscroll
-
-      preview.onscroll = undefined
       preview.scrollTop = percent * (height - clientHeight)
-      preview.scroll = oldScroll
     },
 
     compiledMarkdown () {
@@ -55,21 +57,19 @@ export default {
     }
   },
 
-  computed: {
-    compiledMarkdown () {
-      return marked(this.markdown)
-    }
+  created () {
+    this.initMarked()
   },
 
   methods: {
     initMarked () {
       const renderer = new marked.Renderer()
 
-      renderer.checkbox = isChecked => {
-        return '<i class="icon icon-check' + (isChecked ? '' : '-empty') + '"></i> '
+      renderer.checkbox = (isChecked: boolean) => {
+        return `<i class="icon icon-check${isChecked ? '' : '-empty'}"></i>`
       }
 
-      renderer.image = (href, title, text) => {
+      renderer.image = (href: string, title: string, text: string) => {
         if (href.indexOf('http') !== 0) {
           href = 'file:///' + this.filePath + href
         }
@@ -78,49 +78,48 @@ export default {
         let size = ''
 
         if (title && (m = title.match(/^(\d+)x(\d+)$/))) {
-          size = ' width="' + m[1] + '" height="' + m[2] + '"'
+          size = ` width="${m[1]}" height="${m[2]}"`
         }
 
-        return '<img src="' + href + '" alt="' + text + '"' +
-          (title ? ' title="' + title + '"' : '') + size + '>'
+        return `<img src="${href}" alt="${text}" ${title ? 'title="' + title + '"' : ''} ${size} />`
       }
 
       marked.setOptions({
         renderer,
         gfm: true,
         breaks: true,
-        tables: true,
         smartypants: true,
         langPrefix: '',
-        highlight: (code) => {
-          return hljs.highlightAuto(code).value
-        }
+        highlight: (code: string) => hljs.highlightAuto(code).value
       })
     },
 
     updateCheckboxes () {
       Array.from(document.getElementsByClassName('icon')).forEach(el => {
-        if (el.parentNode && el.parentNode.tagName === 'LI') {
-          el.parentNode.classList.add('checklist')
+        if (el.parentNode && (el.parentNode as any).tagName === 'LI') {
+          (el.parentNode as any).classList.add('checklist')
         }
       })
     },
 
     updateLinks () {
       Array.from(document.getElementsByTagName('a')).forEach(link => {
-        link.onclick = evt => {
-          if (evt.target.hostname === 'localhost' && evt.target.hash.length) {
+        link.onclick = (evt: MouseEvent) => {
+          const target = (evt.target as any)
+
+          if (target.hostname === 'localhost' && target.hash.length) {
             return
           }
 
           evt.stopPropagation()
           evt.preventDefault()
-          shell.openExternal(evt.target.href)
+
+          shell.openExternal(target.href)
         }
       })
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

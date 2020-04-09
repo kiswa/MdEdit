@@ -1,14 +1,15 @@
 <template>
-<div id="status">
-  <div>{{ filename }}</div>
-  <div>
-    {{ fileStatus }}
+  <div id="status">
+    <div>{{ filename }}</div>
+    <div>{{ fileStatus }}</div>
   </div>
-</div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
+  name: 'StatusBar',
+
   props: {
     isEdited: {
       type: Boolean,
@@ -32,7 +33,7 @@ export default {
       this.fileStatus = this.isEdited ? 'Unsaved Changes' : ''
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

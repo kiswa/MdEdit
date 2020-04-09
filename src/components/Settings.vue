@@ -2,17 +2,22 @@
   <div id="settings">
     <h3>
       MdEdit Settings
-      <div id="closeSettings" title="Close Settings"
-        @click="closeSettings" v-if="iconsLoaded">
-        <font-awesome-icon v-if="usePro" :icon="['fal', 'times']" />
-        <font-awesome-icon v-else icon="times" />
+      <div
+        v-if="iconsLoaded"
+        id="closeSettings"
+        title="Close Settings"
+        @click="closeSettings"
+      >
+        <font-awesome-icon :icon="['fal', 'times']" />
       </div>
     </h3>
 
     <p>
       Theme:
-      <select v-model="settings.selectedTheme"
-        @change="updateTheme">
+      <select
+        v-model="settings.selectedTheme"
+        @change="updateTheme"
+      >
         <option>Light</option>
         <option>Dark</option>
       </select>
@@ -21,57 +26,70 @@
     <p>
       <label>
         Re-Open previously open file?
-        <input type="checkbox" class="hidden"
+        <input
           v-model="settings.reopen"
-          @change="updateSetting('reopen', $event.target.checked)">
-        <span class="toggle"></span>
+          type="checkbox"
+          class="hidden"
+          @change="updateSetting('reopen', $event.target.checked)"
+        >
+        <span class="toggle" />
       </label>
     </p>
 
     <p>
       <label>
         Remember view layout?
-        <input type="checkbox" class="hidden"
+        <input
           v-model="settings.layout"
-          @change="updateSetting('layout', $event.target.checked)">
-        <span class="toggle"></span>
+          type="checkbox"
+          class="hidden"
+          @change="updateSetting('layout', $event.target.checked)"
+        >
+        <span class="toggle" />
       </label>
     </p>
 
     <p>
       <label>
         Show status bar?
-        <input type="checkbox" class="hidden"
+        <input
           v-model="settings.showStatus"
-          @change="updateSetting('showStatus', $event.target.checked)">
-        <span class="toggle"></span>
+          type="checkbox"
+          class="hidden"
+          @change="updateSetting('showStatus', $event.target.checked)"
+        >
+        <span class="toggle" />
       </label>
     </p>
 
     <div class="bottom">
-      <img src="../assets/icon.png" width="128">
-      MdEdit v1.1.1
+      <img
+        src="../assets/icon.png"
+        width="128"
+      >
+      MdEdit v1.2.0
       <p>
-        <a href="https://opensource.org/licenses/MIT"
-          @click="openExternal">MIT License</a> |
-        <a href="https://github.com/kiswa/MdEdit"
-          @click="openExternal">GitHub Repo</a>
+        <a
+          href="https://opensource.org/licenses/MIT"
+          @click="openExternal"
+        >MIT License</a> |
+        <a
+          href="https://github.com/kiswa/MdEdit"
+          @click="openExternal"
+        >GitHub Repo</a>
       </p>
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import { shell } from 'electron'
 
-export default {
-  name: 'MdEditSettings',
+export default Vue.extend({
+  name: 'Settings',
 
   props: {
-    usePro: {
-      type: Boolean,
-      default: false
-    },
     iconsLoaded: {
       type: Boolean,
       default: false
@@ -91,8 +109,9 @@ export default {
   },
 
   mounted () {
-    this.settings = localStorage.getItem('settings')
-      ? JSON.parse(localStorage.getItem('settings'))
+    const settingsStr = localStorage.getItem('settings')
+    this.settings = settingsStr
+      ? JSON.parse(settingsStr)
       : {
         theme: 'light',
         selectedTheme: 'Light',
@@ -107,28 +126,29 @@ export default {
       this.$emit('closeSettings')
     },
 
-    updateTheme (evt) {
-      const selectedTheme = evt.target.value
+    updateTheme (evt: Event) {
+      const selectedTheme = (evt.target as HTMLSelectElement).value
       const theme = selectedTheme.toLowerCase()
 
       this.settings.selectedTheme = selectedTheme
       this.updateSetting('theme', theme)
     },
 
-    updateSetting (name, value) {
-      this.settings[name] = value
+    updateSetting (name: string, value: string) {
+      (this.settings as any)[name] = value
       localStorage.setItem('settings', JSON.stringify(this.settings))
 
       this.$emit('settingsChanged')
     },
 
-    openExternal (evt) {
+    openExternal (evt: Event) {
       evt.stopPropagation()
       evt.preventDefault()
-      shell.openExternal(evt.target.href)
+
+      shell.openExternal((evt.target as HTMLLinkElement).href)
     }
   }
-}
+})
 </script>
 
 <style lang="scss">
@@ -165,6 +185,7 @@ export default {
               2px 3px 1px -2px rgba(0, 0, 0, .2);
   cursor: default;
   left: 0;
+  min-width: 17rem;
   position: absolute;
   top: 39px;
   user-select: none;
