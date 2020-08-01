@@ -224,6 +224,8 @@ export default Vue.extend({
       const path = localStorage.getItem('lastFile') || ''
       this.openFileFromPath(path)
     }
+
+    this.focusEditor()
   },
 
   methods: {

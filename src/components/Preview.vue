@@ -71,7 +71,7 @@ export default Vue.extend({
 
       renderer.image = (href: string, title: string, text: string) => {
         if (href.indexOf('http') !== 0) {
-          href = 'file:///' + this.filePath + href
+          href = 'safe-file://' + this.filePath + href
         }
 
         let m

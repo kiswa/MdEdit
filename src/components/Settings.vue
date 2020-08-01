@@ -67,7 +67,7 @@
         src="../assets/icon.png"
         width="128"
       >
-      MdEdit v2.0.1
+      MdEdit v2.0.2
       <p>
         <a
           href="https://opensource.org/licenses/MIT"

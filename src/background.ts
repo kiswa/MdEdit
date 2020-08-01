@@ -21,8 +21,8 @@ function createWindow () {
     height: 600,
     width: 800,
     webPreferences: {
+      enableRemoteModule: true,
       nodeIntegration: true,
-      webSecurity: false
     }
   })
 
@@ -74,6 +74,15 @@ app.on('activate', () => {
 })
 
 app.on('ready', () => {
+  protocol.registerFileProtocol('safe-file', (req, cb) => {
+    const url = req.url.replace(`safe-file://`, '')
+    try {
+      return cb(decodeURIComponent(url))
+    } catch (error) {
+      console.error(error)
+    }
+  })
+
   mainWindow = createWindow()
 })
 
